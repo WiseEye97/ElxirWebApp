@@ -1,4 +1,5 @@
 import * as React from 'react'
+import * as JQuery from 'jquery'
 
 import '../../css/app.css'
 
@@ -19,7 +20,21 @@ export default class LoginComponent extends React.Component<any,ILoginState> {
         this.changeState = this.changeState.bind(this);
     }
 
-    handleClick() {
+    handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
+
+        event.preventDefault();
+
+        JQuery.post("/api/login",{
+            login : this.state.login,
+            password : this.state.password
+        }, function( data ) {
+            console.log('From first function' + data);
+        })
+        .done(function(x){
+            
+            console.log('From second function' + x);
+        });
+
         this.setState(state => ({
           isToggleOn: !state.isToggleOn
         }));
@@ -27,18 +42,13 @@ export default class LoginComponent extends React.Component<any,ILoginState> {
 
     changeState(event : React.ChangeEvent<HTMLInputElement>){
         let target = event.target;
-        switch(target.name){
-            case "username" : 
-                this.setState(function(state,props){
-                    return {login: target.value}
-                });
-                break;
-            case "password":
-                this.setState(function(state,props){
-                    return {password: target.value}
-                });
-                break;
-        }
+
+        let updatedObj : any = new Object();
+        updatedObj[target.name] = target.value;
+        this.setState(function(_state,_props){
+            return updatedObj;
+        });
+
     }
 
     render() {
@@ -52,7 +62,7 @@ export default class LoginComponent extends React.Component<any,ILoginState> {
                         <h1>Login Form</h1>
                     </div>
                     <div className="content">
-                        <input name="username" type="text" className="input username" placeholder="Username" onChange={this.changeState} />
+                        <input name="login" type="text" className="input username" placeholder="Username" onChange={this.changeState} />
                         <input name="password" type="password" className="input password" placeholder="Password" onChange={this.changeState} />
                     </div>
                     <div className="footer">
