@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as JQuery from 'jquery'
+import { RouteComponentProps } from "react-router-dom";
 
 import '../../css/app.css'
 
@@ -9,15 +10,30 @@ interface ILoginState {
     password : string
 }
 
-export default class LoginComponent extends React.Component<any,ILoginState> {
+interface ILoginResponse {
+    status : string
+    token : string
+}
 
-    constructor(props : any) {
+export interface ILoginProps{
+    onLogin : () => void
+}
+
+export class LoginComponent extends React.Component<ILoginProps,ILoginState> {
+
+    onLoginSuccess : () => void;
+
+    constructor(props : ILoginProps) {
         super(props);
+
+        this.onLoginSuccess = props.onLogin;
+
         this.state = {isToggleOn: true,login : "",password : ""};
     
         // Poniższe wiązanie jest niezbędne do prawidłowego przekazania `this` przy wywołaniu funkcji
         this.handleClick = this.handleClick.bind(this);
         this.changeState = this.changeState.bind(this);
+
     }
 
     handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
@@ -27,8 +43,11 @@ export default class LoginComponent extends React.Component<any,ILoginState> {
         JQuery.post("/api/login",{
             login : this.state.login,
             password : this.state.password
-        }, function( data ) {
-            console.log('From first function' + data);
+        }, data => {
+            this.onLoginSuccess();
+            let status = data as ILoginResponse;
+            console.log(status.status,status.token);
+            console.log('From first function' + data);  
         })
         .done(function(x){
             

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router-dom'
-import Login from '../components/Login'
+import {LoginComponent,ILoginProps} from '../components/Login'
 
-const LoginComponent: React.FC<RouteComponentProps> = () => <Login></Login>
+const Login: React.FC<RouteComponentProps & ILoginProps> = (prp : ILoginProps) => <LoginComponent onLogin={prp.onLogin}></LoginComponent>
 
-export default LoginComponent
+export default Login
