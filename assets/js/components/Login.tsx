@@ -1,11 +1,14 @@
 import * as React from 'react'
-import { RouteComponentProps,Redirect } from "react-router-dom";
+import { RouteComponentProps,Redirect,withRouter } from "react-router-dom";
 import 'react-bulma-components/dist/react-bulma-components.min.css';
-//import { Field, Control, Label, Input, Textarea, Select, Checkbox, Radio, Help, InputFile } from 'react-bulma-components/lib/components/form';
 import { Button,Form } from 'react-bulma-components';
 
 import axios from 'axios';
+import store from '../store/store';
 
+import { putToken,deleteToken } from '../store/types'
+import {Action} from 'redux'
+import { combineReducers,createAction } from '@reduxjs/toolkit'
 import '../../css/app.css'
 
 interface ILoginState {
@@ -20,74 +23,73 @@ interface ILoginResponse {
     token : string
 }
 
-export interface ILoginProps{
-    onLogin : (arg0:string) => void
-    onLoginFailed : () => void
-    redirectToRegister : () => void
-}
+type ClickEvent = React.MouseEvent<HTMLInputElement, MouseEvent>;
 
+const LoginComponent  = (props : RouteComponentProps) => {
+    const [state,setState] = React.useState<ILoginState>({isToggleOn: true,login : "",password : "",isLogging : false})
 
-export class LoginComponent extends React.Component<ILoginProps,ILoginState> {
-
-    constructor(props : ILoginProps) {
-        super(props);
-
-        this.state = {isToggleOn: true,login : "",password : "",isLogging : false};
-    
-        // Poniższe wiązanie jest niezbędne do prawidłowego przekazania `this` przy wywołaniu funkcji
-        this.handleClick = this.handleClick.bind(this);
-        this.changeState = this.changeState.bind(this);
-
+    const changeState = (event : React.ChangeEvent<HTMLInputElement>) => {
+        let target = event.target;
+        let newState : any = new Object();
+        newState[target.name] = target.value;
+        setState(oldState  => {
+            let newState : any = {...oldState};
+            newState[target.name] = target.value;
+            return newState;
+        });
     }
 
-    handleClick(event : React.MouseEvent<HTMLInputElement, MouseEvent>) {
+    const handleLoginClick = (event : ClickEvent) => {
 
         event.preventDefault();
 
         axios.post("/api/login",{
-            login : this.state.login,
-            password : this.state.password
+            login : state.login,
+            password : state.password
         })
         .then(response => {
             let status = response.data as ILoginResponse;
-            this.props.onLogin(status.token);
+            if(status.status === 'ok'){
+                const putTokenMsg = putToken({token : status.token});
+                store.dispatch(putTokenMsg);
+                localStorage.setItem('token',status.token);
+                props.history.push('/userpage');
+            }
         })
         .catch(reason => console.error(reason));
 
-        this.setState(state => ({
-          isToggleOn: !state.isToggleOn
-        }));
+        setState(state => {
+            let newState = {...state};
+            newState.isToggleOn = !state.isToggleOn;
+            return newState;
+        });
     }
 
-    changeState(event : React.ChangeEvent<HTMLInputElement>){
-        let target = event.target;
-        let newState : any = new Object();
-        newState[target.name] = target.value;
-        this.setState(_  => newState);
+    const registerClick = (event : ClickEvent) => {
+        //event.preventDefault();
+        props.history.push('/register');
     }
 
-    render() {
-        return (
-            <div>
-                <Form.Field>
-                    <Form.Label>Login</Form.Label>
-                    <Form.Control>
-                        <Form.Input onChange={this.changeState} name="login" type="text" placeholder="Username" value={this.state.login} />
-                    </Form.Control>
-                </Form.Field>
-                <Form.Field>
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control>
-                        <Form.Input onChange={this.changeState} name="password" type="password" value={this.state.password} />
-                    </Form.Control>
-                </Form.Field>
-                <div className="footer">
-                        <Button loading={this.state.isLogging} onClick={this.handleClick}>Login</Button>
-                        <Button onClick={this.props.redirectToRegister}>Register</Button>
-                </div>
+    return (
+        <div>
+            <Form.Field>
+                <Form.Label>Login</Form.Label>
+                <Form.Control>
+                    <Form.Input onChange={changeState} name="login" type="text" placeholder="Username" value={state.login} />
+                </Form.Control>
+            </Form.Field>
+            <Form.Field>
+                <Form.Label>Password</Form.Label>
+                <Form.Control>
+                    <Form.Input onChange={changeState} name="password" type="password" value={state.password} />
+                </Form.Control>
+            </Form.Field>
+            <div className="footer">
+                    <Button loading={state.isLogging} onClick={handleLoginClick}>Login</Button>
+                    <Button onClick={registerClick}>Register</Button>
             </div>
-        );
-    }
-}
+        </div>
+    );
+} 
 
-export const LoginPage = LoginComponent;
+export const LoginPage = withRouter(LoginComponent);

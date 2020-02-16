@@ -4,6 +4,8 @@ defmodule Hello.Accounts do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Query, only: [from: 2]
+  import Ecto.Changeset
   alias Hello.Repo
 
   alias Hello.Accounts.Player
@@ -38,9 +40,8 @@ defmodule Hello.Accounts do
   def get_player!(id), do: Repo.get!(Player, id)
 
   def is_nick_or_email_exists?(nick,email) do
-    query = from p in Player,
-            :where p.name == nick,
-            :where p.email == email
+    query = from p in "players",
+              where: p.name == ^nick and p.email == ^email
 
     Repo.exists?(query)
   end
