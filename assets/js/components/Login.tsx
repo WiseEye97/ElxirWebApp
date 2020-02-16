@@ -1,6 +1,10 @@
 import * as React from 'react'
-import * as JQuery from 'jquery'
-import { RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps,Redirect } from "react-router-dom";
+import 'react-bulma-components/dist/react-bulma-components.min.css';
+//import { Field, Control, Label, Input, Textarea, Select, Checkbox, Radio, Help, InputFile } from 'react-bulma-components/lib/components/form';
+import { Button,Form } from 'react-bulma-components';
+
+import axios from 'axios';
 
 import '../../css/app.css'
 
@@ -8,6 +12,7 @@ interface ILoginState {
     isToggleOn: boolean
     login: string
     password : string
+    isLogging : boolean
 }
 
 interface ILoginResponse {
@@ -16,19 +21,18 @@ interface ILoginResponse {
 }
 
 export interface ILoginProps{
-    onLogin : () => void
+    onLogin : (arg0:string) => void
+    onLoginFailed : () => void
+    redirectToRegister : () => void
 }
 
-export class LoginComponent extends React.Component<ILoginProps,ILoginState> {
 
-    onLoginSuccess : () => void;
+export class LoginComponent extends React.Component<ILoginProps,ILoginState> {
 
     constructor(props : ILoginProps) {
         super(props);
 
-        this.onLoginSuccess = props.onLogin;
-
-        this.state = {isToggleOn: true,login : "",password : ""};
+        this.state = {isToggleOn: true,login : "",password : "",isLogging : false};
     
         // Poniższe wiązanie jest niezbędne do prawidłowego przekazania `this` przy wywołaniu funkcji
         this.handleClick = this.handleClick.bind(this);
@@ -40,19 +44,15 @@ export class LoginComponent extends React.Component<ILoginProps,ILoginState> {
 
         event.preventDefault();
 
-        JQuery.post("/api/login",{
+        axios.post("/api/login",{
             login : this.state.login,
             password : this.state.password
-        }, data => {
-            this.onLoginSuccess();
-            let status = data as ILoginResponse;
-            console.log(status.status,status.token);
-            console.log('From first function' + data);  
         })
-        .done(function(x){
-            
-            console.log('From second function' + x);
-        });
+        .then(response => {
+            let status = response.data as ILoginResponse;
+            this.props.onLogin(status.token);
+        })
+        .catch(reason => console.error(reason));
 
         this.setState(state => ({
           isToggleOn: !state.isToggleOn
@@ -61,35 +61,33 @@ export class LoginComponent extends React.Component<ILoginProps,ILoginState> {
 
     changeState(event : React.ChangeEvent<HTMLInputElement>){
         let target = event.target;
-
-        let updatedObj : any = new Object();
-        updatedObj[target.name] = target.value;
-        this.setState(function(_state,_props){
-            return updatedObj;
-        });
-
+        let newState : any = new Object();
+        newState[target.name] = target.value;
+        this.setState(_  => newState);
     }
 
     render() {
         return (
             <div>
-                <h1>{this.state.login}</h1>
-                <h1>{this.state.password}</h1>
-                <h1></h1>
-                <form className="login-form">
-                    <div className="header">
-                        <h1>Login Form</h1>
-                    </div>
-                    <div className="content">
-                        <input name="login" type="text" className="input username" placeholder="Username" onChange={this.changeState} />
-                        <input name="password" type="password" className="input password" placeholder="Password" onChange={this.changeState} />
-                    </div>
-                    <div className="footer">
-                        <input type="submit" name="submit" value="Login" className="button" onClick={this.handleClick} />
-                        <input type="submit" name="submit" value="Register" className="register" />
-		            </div>
-                </form>
+                <Form.Field>
+                    <Form.Label>Login</Form.Label>
+                    <Form.Control>
+                        <Form.Input onChange={this.changeState} name="login" type="text" placeholder="Username" value={this.state.login} />
+                    </Form.Control>
+                </Form.Field>
+                <Form.Field>
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control>
+                        <Form.Input onChange={this.changeState} name="password" type="password" value={this.state.password} />
+                    </Form.Control>
+                </Form.Field>
+                <div className="footer">
+                        <Button loading={this.state.isLogging} onClick={this.handleClick}>Login</Button>
+                        <Button onClick={this.props.redirectToRegister}>Register</Button>
+                </div>
             </div>
         );
     }
 }
+
+export const LoginPage = LoginComponent;

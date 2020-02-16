@@ -1,4 +1,28 @@
 /* This file is for your main application css. */
 
 @import "./phoenix.css";
-@import "./loginstyle.css"
+@import "./loginstyle.css";
+
+*{
+    background-color: black;
+}
+
+.center {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+  }
+
+.menu{
+    max-width: 200px;
+}
+
+.clrBth{
+    clear: both;
+}
+
+#PageBody {
+    height: 1000px;
+}
+
+

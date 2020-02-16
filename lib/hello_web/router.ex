@@ -17,6 +17,7 @@ defmodule HelloWeb.Router do
     pipe_through :api
 
     post "/login", UserController, :login
+    post "/register", UserController, :register
   end
 
   scope "/", HelloWeb do
