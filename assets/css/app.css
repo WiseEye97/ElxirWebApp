@@ -2,6 +2,7 @@
 
 @import "./phoenix.css";
 @import "./loginstyle.css";
+@import "./dashboard.css";
 
 *{
     background-color: black;

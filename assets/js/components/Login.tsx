@@ -1,14 +1,12 @@
 import * as React from 'react'
 import { RouteComponentProps,Redirect,withRouter } from "react-router-dom";
 import 'react-bulma-components/dist/react-bulma-components.min.css';
-import { Button,Form } from 'react-bulma-components';
+import { Button,Form,Container } from 'react-bulma-components';
 
 import axios from 'axios';
 import store from '../store/store';
 
 import { putToken,deleteToken } from '../store/types'
-import {Action} from 'redux'
-import { combineReducers,createAction } from '@reduxjs/toolkit'
 import '../../css/app.css'
 
 interface ILoginState {
@@ -43,7 +41,7 @@ const LoginComponent  = (props : RouteComponentProps) => {
 
         event.preventDefault();
 
-        axios.post("/api/login",{
+        axios.post("/sessions/sign_in",{
             login : state.login,
             password : state.password
         })
@@ -71,7 +69,7 @@ const LoginComponent  = (props : RouteComponentProps) => {
     }
 
     return (
-        <div>
+        <Container className="is-two-thirds">
             <Form.Field>
                 <Form.Label>Login</Form.Label>
                 <Form.Control>
@@ -85,10 +83,10 @@ const LoginComponent  = (props : RouteComponentProps) => {
                 </Form.Control>
             </Form.Field>
             <div className="footer">
-                    <Button loading={state.isLogging} onClick={handleLoginClick}>Login</Button>
-                    <Button onClick={registerClick}>Register</Button>
+                <Button className="is-link is-outlined" loading={state.isLogging} onClick={handleLoginClick}>Login</Button>
+                <Button className="is-link is-outlined" onClick={registerClick}>Register</Button>
             </div>
-        </div>
+        </Container>
     );
 } 
 

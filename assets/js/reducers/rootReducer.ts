@@ -1,8 +1,8 @@
 import { Action } from 'redux'
-import { ActionTypes,PUT_TOKEN,DELETE_TOKEN,IPutAuthToken } from '../store/types'
+import { ActionTypes,PUT_TOKEN,DELETE_TOKEN,IPutAuthToken,IDeleteAuthToken } from '../store/types'
 import { Option,none,some } from 'fp-ts/lib/Option'
-import { combineReducers,createAction,createReducer } from '@reduxjs/toolkit'
-import { putToken } from '../store/types'
+import { combineReducers,createAction,createReducer, PayloadAction } from '@reduxjs/toolkit'
+import { putToken , deleteToken} from '../store/types'
 
 type Token = string
 
@@ -15,8 +15,17 @@ const initial : IAppStore = {
 };
 
 export const reducer = 
-    createReducer(initial,builder => {
-        builder.addCase(putToken,(state : IAppStore,action) => {
-
-        })
+    createReducer(initial,{
+        [putToken.type] : (state : IAppStore,action : PayloadAction<IPutAuthToken>) => {
+            return {
+                ...state,
+                token : some(action.payload.token)
+            }
+        },
+        [deleteToken.type] : (state : IAppStore,_ : PayloadAction<IDeleteAuthToken>) => {
+            return {
+                ...state,
+                token : none
+            }
+        }
     })

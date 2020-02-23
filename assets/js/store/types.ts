@@ -10,11 +10,9 @@ export interface IPutAuthToken{
     token : Token
 }
 
-export interface IDeleteAuthToken{
-    type: typeof DELETE_TOKEN
-}
+export interface IDeleteAuthToken{}
 
 export type ActionTypes = IPutAuthToken | IDeleteAuthToken 
 
-export const putToken = createAction<IPutAuthToken>(typeof PUT_TOKEN);
-export const deleteToken = createAction<IDeleteAuthToken>(typeof DELETE_TOKEN);
+export const putToken = createAction<IPutAuthToken>(PUT_TOKEN);
+export const deleteToken = createAction<IDeleteAuthToken>(DELETE_TOKEN);

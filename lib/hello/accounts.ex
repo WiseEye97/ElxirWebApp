@@ -45,6 +45,10 @@ defmodule Hello.Accounts do
 
     Repo.exists?(query)
   end
+
+  def get_player_by_nick!(nick) do
+      Repo.get_by(Player,name: nick)
+  end
   @doc """
   Creates a player.
 
