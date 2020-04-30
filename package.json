@@ -13,7 +13,7 @@
     "fp-ts": "^2.4.3",
     "immutable": "^4.0.0-rc.12",
     "io-ts": "^2.0.6",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "phoenix": "file:deps/phoenix",
     "phoenix_html": "file:deps/phoenix_html",
     "react": "^16.10.2",
